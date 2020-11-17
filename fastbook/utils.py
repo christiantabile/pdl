@@ -25,12 +25,21 @@ def get_image_files_sorted(path, recurse=True, folders=None): return get_image_f
 # +
 # pip install azure-cognitiveservices-search-imagesearch
 
-from azure.cognitiveservices.search.imagesearch import ImageSearchClient as api
-from msrest.authentication import CognitiveServicesCredentials as auth
+# from azure.cognitiveservices.search.imagesearch import ImageSearchClient as api
+# from msrest.authentication import CognitiveServicesCredentials as auth
 
-def search_images_bing(key, term, min_sz=128):
-    client = api('https://api.cognitive.microsoft.com', auth(key))
-    return L(client.images.search(query=term, count=150, min_height=min_sz, min_width=min_sz).value)
+import requests
+import matplotlib.pyplot
+
+def search_images_bing(subscription_key, search_term, image_count: int = 150, **kwargs):
+    search_url = "https://api.bing.microsoft.com/v7.0/images/search"
+    headers = {"Ocp-Apim-Subscription-Key" : subscription_key}
+    params = {'q':search_term, 'count':image_count}
+    response = requests.get(search_url, headers=headers, params = params)
+    response.raise_for_status()
+    search_results = response.json()
+   #  client = api(endpoint=sub_endpoint, credentials=auth(key))
+    return L(search_results['value'])
 
 
 # -
